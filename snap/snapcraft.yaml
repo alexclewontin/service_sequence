@@ -39,6 +39,7 @@ apps:
         command: bin/seq_service_before.sh 5
         daemon: simple
         before: [seq-service-b4]
+
     seq-service-a1:
         command: bin/seq_service_after.sh 1
         daemon: simple
