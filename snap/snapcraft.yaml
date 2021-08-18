@@ -1,0 +1,61 @@
+name: seqtest  # you probably want to 'snapcraft register <name>'
+base: core20 # the base snap is the execution environment for this snap
+version: '0.0' # just for humans, typically '1.2+git' or '1.3.2'
+summary: Testing service startup sequencing
+description: |
+    Starts a few services in sequence to determine actual ordering between them both on installation and upon restarting the snap. 
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+
+
+parts:
+    config:
+        plugin: dump
+        source: scripts/
+        organize:
+            '*.sh': bin/
+
+system-usernames:
+    snap_daemon: shared
+       
+apps:
+    seq-service-b1:
+        command: bin/seq_service_before.sh 1
+        daemon: simple
+    seq-service-b2:
+        command: bin/seq_service_before.sh 2
+        daemon: simple
+        before: [seq-service-b1]
+    seq-service-b3:
+        command: bin/seq_service_before.sh 3
+        daemon: simple
+        before: [seq-service-b2]
+    seq-service-b4:
+        command: bin/seq_service_before.sh 4
+        daemon: simple
+        before: [seq-service-b3]
+    seq-service-b5:
+        command: bin/seq_service_before.sh 5
+        daemon: simple
+        before: [seq-service-b4]
+    seq-service-a1:
+        command: bin/seq_service_after.sh 1
+        daemon: simple
+    seq-service-a2:
+        command: bin/seq_service_after.sh 2
+        daemon: simple
+        after: [seq-service-a1]
+    seq-service-a3:
+        command: bin/seq_service_after.sh 3
+        daemon: simple
+        after: [seq-service-a2]
+    seq-service-a4:
+        command: bin/seq_service_after.sh 4
+        daemon: simple
+        after: [seq-service-a3]
+    seq-service-a5:
+        command: bin/seq_service_after.sh 5
+        daemon: simple
+        after: [seq-service-a4]
+
