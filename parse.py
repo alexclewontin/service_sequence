@@ -4,8 +4,11 @@ import tabulate
 basename = '/var/snap/seqtest/common/'
 
 for name in ['before', 'after']:
-    with open(os.path.join(basename, f'{name}_log.txt'), 'r') as f:
-        raw = f.read()
+    try:
+        with open(os.path.join(basename, f'{name}_log.txt'), 'r') as f:
+            raw = f.read()
+    except:
+        continue
     lines = raw.strip().split('\n')
     table = []
     for x in lines:
