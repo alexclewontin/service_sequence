@@ -10,53 +10,32 @@ confinement: strict # use 'strict' once you have the right plugs and slots
 
 
 parts:
-    config:
+    daemons:
         plugin: dump
         source: scripts/
         organize:
             '*.sh': bin/
+    reader:
+        plugin: python
+        source: .
+        python-packages: [tabulate]
 
 system-usernames:
     snap_daemon: shared
-       
-apps:
-    seq-service-b1:
-        command: bin/seq_service_before.sh 1
-        daemon: simple
-    seq-service-b2:
-        command: bin/seq_service_before.sh 2
-        daemon: simple
-        before: [seq-service-b1]
-    seq-service-b3:
-        command: bin/seq_service_before.sh 3
-        daemon: simple
-        before: [seq-service-b2]
-    seq-service-b4:
-        command: bin/seq_service_before.sh 4
-        daemon: simple
-        before: [seq-service-b3]
-    seq-service-b5:
-        command: bin/seq_service_before.sh 5
-        daemon: simple
-        before: [seq-service-b4]
 
-    seq-service-a1:
-        command: bin/seq_service_after.sh 1
-        daemon: simple
-    seq-service-a2:
-        command: bin/seq_service_after.sh 2
-        daemon: simple
-        after: [seq-service-a1]
-    seq-service-a3:
-        command: bin/seq_service_after.sh 3
-        daemon: simple
-        after: [seq-service-a2]
-    seq-service-a4:
-        command: bin/seq_service_after.sh 4
-        daemon: simple
-        after: [seq-service-a3]
-    seq-service-a5:
-        command: bin/seq_service_after.sh 5
-        daemon: simple
-        after: [seq-service-a4]
+apps:
+    read-log:
+        command: bin/python3 $SNAP/parse.py
+    early:
+        command: bin/seq_service.sh early
+        daemon: oneshot
+    middle:
+        command: bin/seq_service.sh middle
+        daemon: oneshot
+        after: [late]
+        before: [early]
+    late:
+        command: bin/seq_service.sh late
+        daemon: oneshot
+
 
